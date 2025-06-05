@@ -9,6 +9,7 @@ from typing import List, Dict, Optional
 import pytz
 from urllib.parse import urlencode
 import csv
+import pandas as pd
 
 
 # Load environment variables
@@ -21,8 +22,8 @@ PASSWORD = 'Vanaja@13882'
 # Hardcoded inputs
 PROJECT_CODES = ['0193', '0191']
 START_DATE = '2025-05-01'
-END_DATE = '2025-05-15'
-TOKEN = "eyJraWQiOiJRYjZZNEVhSVNseXJoTzdFaVFPeFJjbE0xaTdDTWZuRXQ2VXBaUGhUa21JPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiYTZXWjRTRHpyNEtJVnNRNC1zREdtZyIsInN1YiI6IjAyNWExYWQ2LWE4NDQtNGQ2MC1hMzRlLThhODMzYmQ5MDY5MSIsImN1c3RvbTpyZXN0cmljdFByb2plY3RzIjoibm8iLCJjdXN0b206dGltZXpvbmUiOiJBbWVyaWNhXC9OZXdfWW9yayIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjdXN0b206bGFzdE5hbWUiOiJBZG1pbiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xXzdCQkJoR2YxcCIsImN1c3RvbTpwcmV2ZW50RG93bmxvYWQiOiJubyIsImNvZ25pdG86dXNlcm5hbWUiOiIwMjVhMWFkNi1hODQ0LTRkNjAtYTM0ZS04YTgzM2JkOTA2OTEiLCJjdXN0b206c3RhcnREYXRlIjoiMjAyNC0xMi0xNiIsImN1c3RvbTpvcmdhbml6YXRpb25JZCI6Im9yZ2FuaXphdGlvbi04MDJlNjZlOS03YWU3LTQwYTktOTg4MC0xMjU3ZTUwZTNiZTIiLCJjdXN0b206dXNlclR5cGUiOiJ1c2VyLXR5cGUtZWY2NTMwMGQtNDQ5ZC00YmFiLTgzZDEtYmRiOWM0OTA4M2IwIiwiYXVkIjoiMW11bHNkZzZkMWlxY2djZGFkdm1iODVpMDgiLCJldmVudF9pZCI6Ijk5NDFlNzAxLTUxMzUtNDMwYy05NmQyLTdiYzcxYzFmODJmNCIsImN1c3RvbTpmaXJzdE5hbWUiOiJCYWxhLlNreXZpZXciLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc0NjMxMDUxNiwiZXhwIjoxNzQ5MTAwNDUxLCJpYXQiOjE3NDkwOTY4NTIsImVtYWlsIjoiYmFsYStza3l2aWV3X2FkbWluQGVjb3N1aXRlLmlvIn0.UJ_W3dF4C9z5_c1ZhaK1pN-Lj9RAhsvok5UQDKQ5769BT4i5-1a46d0D0sAPcdSl5qsbUlHT-CXrmHEGYcu-5_wS61f20hnbeeq-npO5hZDy6BZ4MA-sX2KLtcvVl0AoaKCe-ikxq3HZzLNksToDry9Y-tM0tJca9iC4spxEcXQCVi7aZhwBMmUBG0oxlWGAi5v0QaTwWEK8hlO7-GyAKmly6WYQQP8razf9YtAWerN8bv9goM9sXbRxsjbzx2j2wZfxhyAWVLDUOWbVEvT8nTF3T3pMlabDwlqasv_IQpmN_Zj16N9PeecGGN1cauVkpQALvXvNB7pwt13JpcouOA"
+END_DATE = '2025-05-16'
+TOKEN = "eyJraWQiOiJRYjZZNEVhSVNseXJoTzdFaVFPeFJjbE0xaTdDTWZuRXQ2VXBaUGhUa21JPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiRmZFbDhic3hVbkhGblNidjZXTkRGUSIsInN1YiI6IjAyNWExYWQ2LWE4NDQtNGQ2MC1hMzRlLThhODMzYmQ5MDY5MSIsImN1c3RvbTpyZXN0cmljdFByb2plY3RzIjoibm8iLCJjdXN0b206dGltZXpvbmUiOiJBbWVyaWNhXC9OZXdfWW9yayIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjdXN0b206bGFzdE5hbWUiOiJBZG1pbiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xXzdCQkJoR2YxcCIsImN1c3RvbTpwcmV2ZW50RG93bmxvYWQiOiJubyIsImNvZ25pdG86dXNlcm5hbWUiOiIwMjVhMWFkNi1hODQ0LTRkNjAtYTM0ZS04YTgzM2JkOTA2OTEiLCJjdXN0b206c3RhcnREYXRlIjoiMjAyNC0xMi0xNiIsImN1c3RvbTpvcmdhbml6YXRpb25JZCI6Im9yZ2FuaXphdGlvbi04MDJlNjZlOS03YWU3LTQwYTktOTg4MC0xMjU3ZTUwZTNiZTIiLCJjdXN0b206dXNlclR5cGUiOiJ1c2VyLXR5cGUtZWY2NTMwMGQtNDQ5ZC00YmFiLTgzZDEtYmRiOWM0OTA4M2IwIiwiYXVkIjoiMW11bHNkZzZkMWlxY2djZGFkdm1iODVpMDgiLCJldmVudF9pZCI6Ijk5NDFlNzAxLTUxMzUtNDMwYy05NmQyLTdiYzcxYzFmODJmNCIsImN1c3RvbTpmaXJzdE5hbWUiOiJCYWxhLlNreXZpZXciLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc0NjMxMDUxNiwiZXhwIjoxNzQ5MTAxNzUyLCJpYXQiOjE3NDkwOTgxNTIsImVtYWlsIjoiYmFsYStza3l2aWV3X2FkbWluQGVjb3N1aXRlLmlvIn0.VSEB1LL3zN8VoHMgymh30a73kOeOI1e0U40Y6bx9t3KFA1ktnYCKCwKMy6Eo0H4IkksTLyhr9feDE4Okafpu6mO5nJ6uLc0XXZyrZHC26Lo5ImSy2LRgkVaMRE8VHfIvbBroPktg-J7xZFxWwBDymI-KsRg4nriAUBnXsqFcS0kCtd7vsbCXvki_HPgjly4iiRTsUt1CALcmbLHU6gSAvhPNKgG5H32rGBYkm2Dy4jLVoqNuMvngdb70eaxytIRHa3YYPRW6fNOVwHXkaAIUvmmEvrxJHgmYil-DY1rI12mI7H9XsNBC2GPLHCkbcAN0u3s090SwrY17JbOTF8xMDA"
 
 # Logging setup
 logging.basicConfig(
@@ -1233,15 +1234,19 @@ def export_project_summary(successful_projects, failed_projects, filename="proje
 def process_bulk_projects(project_codes: List[str], start_date: str, end_date: str, aggregation: str, 
                         debugger: EcosuiteDataExtractorDebugger, token: str, csv_input_filename: str = None) -> bool:
     try:
-        # Create output filename
+        # Create output filename with Powerbi prefix
         if csv_input_filename:
             base_filename = os.path.basename(csv_input_filename)
             base_filename = os.path.splitext(base_filename)[0]
-            consolidated_csv_filename = f"{base_filename}_{start_date}_{end_date}_consolidated_report.csv"
+            consolidated_csv_filename = f"Powerbi_{base_filename}_{start_date}_{end_date}_consolidated_report.csv"
         else:
-            consolidated_csv_filename = f"consolidated_report_{start_date}_{end_date}.csv"
+            consolidated_csv_filename = f"Powerbi_consolidated_report_{start_date}_{end_date}.csv"
         
-        with open(consolidated_csv_filename, 'w', newline='') as consolidated_file:
+        # Create reports folder and use it for saving the CSV
+        reports_folder = create_reports_folder()
+        consolidated_csv_path = os.path.join(reports_folder, consolidated_csv_filename)
+        
+        with open(consolidated_csv_path, 'w', newline='') as consolidated_file:
             # Define CSV headers
             headers = [
                 'Project Code', 'Project Name', 'State', 'COD', 'Size (kW)',
@@ -1255,42 +1260,12 @@ def process_bulk_projects(project_codes: List[str], start_date: str, end_date: s
                 'Total Expected Revenue ($)', 'Total Revenue Variance ($)'
             ]
 
-            import csv
             consolidated_writer = csv.DictWriter(consolidated_file, fieldnames=headers)
             consolidated_writer.writeheader()
             
             # Process each project
             successful_projects = []
             failed_projects = []
-            
-            # Initialize totals for all numeric fields
-            totals = {
-                'size': 0,
-                'actual_gen': 0,
-                'expected_gen': 0,
-                'forecast_gen': 0,
-                'availability_loss': 0,
-                'actual_plus_availability': 0,
-                'actual_insolation': 0,
-                'forecast_insolation': 0,
-                'weather_adjusted_forecast': 0,
-                'weather_adjusted_variance': 0,
-                'anticipated_revenue': 0,
-                'expected_revenue': 0,
-                'revenue_variance': 0,
-                'actual_recs': 0,
-                'expected_recs': 0,
-                'actual_rec_revenue': 0,
-                'expected_rec_revenue': 0,
-                'rec_revenue_variance': 0,
-                'total_anticipated_revenue': 0,
-                'total_expected_revenue': 0,
-                'total_revenue_variance': 0,
-                # Sum for calculating weighted averages
-                'weighted_ppa_rate_sum': 0,
-                'weighted_rec_rate_sum': 0,
-                'project_count': 0
-            }
             
             for project_id in project_codes:
                 print(f"\nProcessing project: {project_id}")
@@ -1561,53 +1536,6 @@ def process_bulk_projects(project_codes: List[str], start_date: str, end_date: s
                 except Exception as e:
                     logger.error(f"Error processing project {project_id}: {e}")
                     failed_projects.append(project_id)
-            
-            # Add a blank row for separation
-            consolidated_writer.writerow({})
-            
-            # Calculate averages and percentages for the totals row
-            if totals['project_count'] > 0:
-                avg_ppa_rate = totals['weighted_ppa_rate_sum'] / totals['size'] if totals['size'] > 0 else 0
-                avg_rec_rate = totals['weighted_rec_rate_sum'] / totals['actual_recs'] if totals['actual_recs'] > 0 else 0
-                
-                # Calculate overall variance percentages
-                variance_pct = ((totals['actual_gen'] - totals['expected_gen']) / totals['expected_gen'] * 100) if totals['expected_gen'] > 0 else 0
-                total_variance_pct = ((totals['actual_plus_availability'] - totals['expected_gen']) / totals['expected_gen'] * 100) if totals['expected_gen'] > 0 else 0
-                insolation_variance_pct = ((totals['actual_insolation'] - totals['forecast_insolation']) / totals['forecast_insolation'] * 100) if totals['forecast_insolation'] > 0 else 0
-                
-                # Update the totals row structure
-                consolidated_writer.writerow({
-                    'Project Code': '',
-                    'Project Name': 'TOTALS',
-                    'State': '',
-                    'COD': '',
-                    'Size (kW)': format_number(totals['size']),
-                    'Actual Generation (kWh)': format_number(totals['actual_gen']),
-                    'Expected Generation (kWh)': format_number(totals['expected_gen']),
-                    'Forecast Generation (kWh)': format_number(totals['forecast_gen']),
-                    'Variance with Expected Generation (%)': f"{variance_pct:.2f}%",
-                    'Availability Loss (kWh)': format_number(totals['availability_loss']),
-                    'Actual + Availability Loss (kWh)': format_number(totals['actual_plus_availability']),
-                    'Total Variance with Expected Generation (%)': f"{total_variance_pct:.2f}%",
-                    'Actual Insolation (kWh/m2)': format_number(totals['actual_insolation']),
-                    'Forecast Insolation (kWh/m2)': format_number(totals['forecast_insolation']),
-                    'Variance Insolation (%)': f"{insolation_variance_pct:.2f}%",
-                    'Weather Adjusted Forecast Generation (kWh)': format_number(totals['weather_adjusted_forecast']),
-                    'Weather Adjusted Generation Variance (kWh)': format_number(totals['weather_adjusted_variance']),
-                    'Av PPA Price ($/kWh)': format_number(avg_ppa_rate),
-                    'Anticipated PPA Revenue ($)': format_number(totals['anticipated_revenue']),
-                    'Expected PPA Revenue ($)': format_number(totals['expected_revenue']),
-                    'PPA Revenue Variance ($)': format_number(totals['revenue_variance']),
-                    'Av REC Sale Price ($/MWh)': format_number(avg_rec_rate),
-                    'Actual RECs Generated': format_number(totals['actual_recs']),
-                    'Expected RECs': format_number(totals['expected_recs']),
-                    'Anticipated RECs Revenue ($)': format_number(totals['actual_rec_revenue']),
-                    'Expected RECs Revenue ($)': format_number(totals['expected_rec_revenue']),
-                    'REC Revenue Variance ($)': format_number(totals['rec_revenue_variance']),
-                    'Total Anticipated Revenue ($)': format_number(totals['total_anticipated_revenue']),
-                    'Total Expected Revenue ($)': format_number(totals['total_expected_revenue']),
-                    'Total Revenue Variance ($)': format_number(totals['total_revenue_variance'])
-                })
             
             # Print summary
             print("\n--- Processing Summary ---")
@@ -1886,7 +1814,7 @@ def create_summary_sheet_xlsxwriter(csv_files: List[str], workbook) -> bool:
 
 def main():
     """
-    Main function to orchestrate the data extraction process.
+    Main function to orchestrate the data extraction process and return a DataFrame for Power BI.
     """
     # Initialize debugger
     debugger = EcosuiteDataExtractorDebugger(None)
@@ -1903,6 +1831,20 @@ def main():
         
         # Process multiple projects
         success = process_bulk_projects(project_codes, start_date, end_date, aggregation, debugger, token)
+        
+        # Create the consolidated report filename
+        consolidated_csv_filename = f"Powerbi_consolidated_report_{start_date}_{end_date}.csv"
+        reports_folder = create_reports_folder()
+        consolidated_csv_path = os.path.join(reports_folder, consolidated_csv_filename)
+        
+        # Read the consolidated CSV into a DataFrame
+        if os.path.exists(consolidated_csv_path):
+            df = pd.read_csv(consolidated_csv_path)
+            logger.info("Successfully loaded consolidated report into DataFrame")
+        else:
+            df = pd.DataFrame()  # Return empty DataFrame if file doesn't exist
+            logger.error("Consolidated report file not found")
+        
         if success:
             print("\nAll projects processed successfully")
         else:
@@ -1911,11 +1853,16 @@ def main():
         # Export debug report
         debugger.export_debug_report()
         
+        # Return DataFrame for Power BI
+        return df
+        
     except Exception as e:
         logger.error(f"An unexpected error occurred: {str(e)}", exc_info=True)
         debugger.log_error("Main Execution", e)
         print(f"\nAn error occurred: {str(e)}")
         print("Check the log file for details.")
+        return pd.DataFrame()  # Return empty DataFrame on error
 
-if __name__ == "__main__":
-    main()
+# Execute main() and store DataFrame in a variable that will be returned to Power BI
+df = main()
+df  # Last line returns DataFrame for Power BI
