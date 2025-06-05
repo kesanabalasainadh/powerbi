@@ -2,11 +2,12 @@ import requests
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 import pandas as pd
+import calendar
 
 # Hardcoded inputs
-PROJECT_CODES = ['0193', '0191']
+PROJECT_CODES = ['0193', '0191','0164']
 START_DATE = '2025-05-01'
-END_DATE = '2025-05-16'
+END_DATE = '2025-05-31'
 TOKEN = "eyJraWQiOiJRYjZZNEVhSVNseXJoTzdFaVFPeFJjbE0xaTdDTWZuRXQ2VXBaUGhUa21JPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiQmtGT0NvU3IzWXQtZ2V5RE1TTlBOQSIsInN1YiI6IjAyNWExYWQ2LWE4NDQtNGQ2MC1hMzRlLThhODMzYmQ5MDY5MSIsImN1c3RvbTpyZXN0cmljdFByb2plY3RzIjoibm8iLCJjdXN0b206dGltZXpvbmUiOiJBbWVyaWNhXC9OZXdfWW9yayIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjdXN0b206bGFzdE5hbWUiOiJBZG1pbiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xXzdCQkJoR2YxcCIsImN1c3RvbTpwcmV2ZW50RG93bmxvYWQiOiJubyIsImNvZ25pdG86dXNlcm5hbWUiOiIwMjVhMWFkNi1hODQ0LTRkNjAtYTM0ZS04YTgzM2JkOTA2OTEiLCJjdXN0b206c3RhcnREYXRlIjoiMjAyNC0xMi0xNiIsImN1c3RvbTpvcmdhbml6YXRpb25JZCI6Im9yZ2FuaXphdGlvbi04MDJlNjZlOS03YWU3LTQwYTktOTg4MC0xMjU3ZTUwZTNiZTIiLCJjdXN0b206dXNlclR5cGUiOiJ1c2VyLXR5cGUtZWY2NTMwMGQtNDQ5ZC00YmFiLTgzZDEtYmRiOWM0OTA4M2IwIiwiYXVkIjoiMW11bHNkZzZkMWlxY2djZGFkdm1iODVpMDgiLCJldmVudF9pZCI6Ijk5NDFlNzAxLTUxMzUtNDMwYy05NmQyLTdiYzcxYzFmODJmNCIsImN1c3RvbTpmaXJzdE5hbWUiOiJCYWxhLlNreXZpZXciLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc0NjMxMDUxNiwiZXhwIjoxNzQ5MTAzMDk2LCJpYXQiOjE3NDkwOTk0OTYsImVtYWlsIjoiYmFsYStza3l2aWV3X2FkbWluQGVjb3N1aXRlLmlvIn0.nfDHrPFXc71hVJuwxl1GogXT6HCJt-XSt68TAcU9hs2s4aeeUMYfHZhil0STlfBjqCFj96QO8hfKeOCi5TtOVAo2usr-Nq--eIMU993i5vo_SkdFjoOWeaOrxa1Gg1oe4ByYIlzbOc08FtUIzefxOTROEeKZG_DU2XduhMVTadh-VZxKjag7S_zpLiWwDsa-kUn-ql_9nDmbnoNQQL-rlcb4TxB91pfmVhS0S3prE-0qkZ63GVXX2nPG1c-kVGwf8WmwsVWM3MnUwlSdarAI0WJOYqzxieh-Dgt-j8u1cDh3ajQjkShEAWy8GfgR0CP1vc2z8BMdmPXOQNRYLpoPLw"
 
 def adjust_end_date(end_date: str) -> str:
@@ -82,7 +83,12 @@ def process_project_data(project_id: str, start_date: str, end_date: str, token:
     energy_data = fetch_ecosuite_energy_datums(project_id, start_date, end_date, token)
     expected_gen_data = fetch_expected_generation(project_id, start_date, end_date, token)
     forecast_data = fetch_forecast_generation(project_id, start_date, end_date, token)
-    
+
+    # Parse date for month name
+    report_date = datetime.strptime(start_date, '%Y-%m-%d')
+    month_name = report_date.strftime('%B').lower()
+    last_day = calendar.monthrange(report_date.year, report_date.month)[1]
+
     # Extract metadata
     project_name = project_details.get('project', {}).get('name', 'Unknown')
     project_state = project_details.get('project', {}).get('state', '')
@@ -90,24 +96,48 @@ def process_project_data(project_id: str, start_date: str, end_date: str, token:
                project_details.get('project', {}).get('productionStartDate', '')
     system_size = project_details.get('project', {}).get('dcSize', 0)
 
-    # Calculate generation values
-    actual_gen = sum(v.get('generation', 0) for v in energy_data.get('values', [])) / 1000  # Convert to kWh
-    expected_gen = sum(v.get('expectedGeneration', 0) for v in expected_gen_data.get('values', [])) / 1000
-    forecast_gen = sum(v.get('predictedGeneration', 0) for v in forecast_data.get('values', [])) / 1000
-    
-    # Calculate variances
-    gen_variance_pct = ((actual_gen - expected_gen) / expected_gen * 100) if expected_gen else 0
-    
-    # Calculate availability loss
-    availability_loss = 0  # This would need actual availability data
-    total_gen = actual_gen + availability_loss
-    combined_variance_pct = ((total_gen - expected_gen) / expected_gen * 100) if expected_gen else 0
+    # Calculate actual generation - updated to match main.py logic
+    actual_gen = 0
+    try:
+        sites = energy_data.get('project', {}).get('sites', {})
+        for site_id, site_data in sites.items():
+            systems = site_data.get('systems', {})
+            for system_id, system_data in systems.items():
+                aggregated_totals = system_data.get('aggregatedTotals', {})
+                for timestamp, values in aggregated_totals.items():
+                    generation = values.get('generation', 0)
+                    actual_gen += generation / 1000  # Convert Wh to kWh
+        print(f"✅ Total actual generation: {actual_gen:,.2f} kWh")
+    except Exception as e:
+        print(f"❌ Error calculating actual generation: {str(e)}")
 
-    # Calculate weather adjustments
-    report_date = datetime.strptime(start_date, '%Y-%m-%d')
-    month_name = report_date.strftime('%B').lower()
-    
-    # Get insolation data
+    # Calculate expected generation - updated to match main.py logic
+    expected_gen = 0
+    try:
+        project_data = expected_gen_data.get('projects', {}).get(project_id, {})
+        if 'expectedGeneration' in project_data:
+            expected_gen = project_data['expectedGeneration'] / 1000
+        else:
+            for date_key, data in project_data.get('aggregatedTotals', {}).items():
+                if date_key.startswith(start_date[:7]):  # Match month/year
+                    expected_gen += data.get('expectedGeneration', 0) / 1000
+    except Exception as e:
+        print(f"Error calculating expected generation: {e}")
+
+    # Calculate forecast generation
+    forecast_gen = 0
+    try:
+        sites = forecast_data.get('projectDatums', {}).get('sites', {})
+        for site_data in sites.values():
+            systems = site_data.get('systems', {})
+            for system_data in systems.values():
+                agg_totals = system_data.get('aggregatedTotals', {})
+                for day_data in agg_totals.values():
+                    forecast_gen += day_data.get('predictedGeneration', 0) / 1000
+    except Exception as e:
+        print(f"Error calculating forecast generation: {e}")
+
+    # Calculate insolation values
     actual_insolation = 0
     forecast_insolation = 0
     try:
@@ -116,15 +146,23 @@ def process_project_data(project_id: str, start_date: str, end_date: str, token:
         systems = first_site.get('systems', {})
         first_system = next(iter(systems.values()), {})
         
-        # Calculate actual insolation from expected generation data
-        actual_insolation = sum(v.get('irradianceHours', 0) for v in expected_gen_data.get('values', [])) / 1000
-        
-        # Get forecast insolation
+        for values in expected_gen_data.get('values', []):
+            actual_insolation += values.get('irradianceHours', 0) / 1000
+            
         monthly_irradiance = first_system.get('forecast', {}).get('irradiance', {}).get('monthlyIrradiance', {})
-        forecast_insolation = monthly_irradiance.get(month_name, 0) * 30  # Approximate month length
+        forecast_insolation = monthly_irradiance.get(month_name, 0) * last_day
     except Exception as e:
         print(f"Error calculating insolation: {e}")
 
+    # Calculate variances
+    gen_variance_pct = ((actual_gen - expected_gen) / expected_gen * 100) if expected_gen else 0
+    
+    # Calculate availability loss and total generation
+    availability_loss = 0  # This would need actual availability data
+    total_gen = actual_gen + availability_loss
+    combined_variance_pct = ((total_gen - expected_gen) / expected_gen * 100) if expected_gen else 0
+    
+    # Calculate weather adjustments
     insolation_variance_pct = ((actual_insolation - forecast_insolation) / forecast_insolation * 100) if forecast_insolation else 0
     weather_normalized_expected = forecast_gen * (actual_insolation / forecast_insolation) if forecast_insolation and actual_insolation else expected_gen
     weather_normalized_variance = actual_gen - weather_normalized_expected
@@ -142,6 +180,14 @@ def process_project_data(project_id: str, start_date: str, end_date: str, token:
                     rec = payment.get('recurrence', {})
                     if rec.get('rateType') == 'fixed':
                         rec_rate = rec.get('startRate', rec_rate)
+                    elif 'rates' in rec:
+                        try:
+                            start_dt = datetime.strptime(rec.get('startDate', '2018-01-01'), '%Y-%m-%d')
+                            years_diff = report_date.year - start_dt.year
+                            if years_diff < len(rec['rates']):
+                                rec_rate = rec['rates'][years_diff].get(month_name, 0)
+                        except Exception:
+                            pass
 
     # Calculate revenues
     actual_revenue = actual_gen * ppa_rate
@@ -150,7 +196,7 @@ def process_project_data(project_id: str, start_date: str, end_date: str, token:
 
     actual_recs = actual_gen / 1000  # Convert to MWh
     expected_recs = expected_gen / 1000
-    rec_rate_display = rec_rate * 1000
+    rec_rate_display = rec_rate * 1000  # Convert to $/MWh
     actual_rec_revenue = actual_recs * rec_rate_display
     expected_rec_revenue = expected_recs * rec_rate_display
     rec_revenue_variance = actual_rec_revenue - expected_rec_revenue
@@ -164,6 +210,8 @@ def process_project_data(project_id: str, start_date: str, end_date: str, token:
         'Project Name': project_name,
         'State': project_state,
         'COD': cod_date,
+        'Start Date': start_date,  # Added start date
+        'End Date': end_date,      # Added end date
         'Size (kW)': system_size,
         'Actual Generation (kWh)': actual_gen,
         'Expected Generation (kWh)': expected_gen,
@@ -200,11 +248,33 @@ def main() -> pd.DataFrame:
         try:
             project_data = process_project_data(project_id, START_DATE, END_DATE, TOKEN)
             all_data.append(project_data)
+            
+            # Add print statements to show generation values with dates
+            print(f"\nProject {project_id} Generation Summary:")
+            print(f"Period: {project_data['Start Date']} to {project_data['End Date']}")
+            print(f"Actual Generation: {project_data['Actual Generation (kWh)']:,.2f} kWh")
+            print(f"Expected Generation: {project_data['Expected Generation (kWh)']:,.2f} kWh")
+            print(f"Forecast Generation: {project_data['Forecast Generation (kWh)']:,.2f} kWh")
+            print(f"Variance with Expected: {project_data['Variance with Expected Generation (%)']}%")
+            
         except Exception as e:
             print(f"Error processing project {project_id}: {str(e)}")
             continue
     
-    return pd.DataFrame(all_data)
+    df = pd.DataFrame(all_data)
+    
+    # Print DataFrame preview with date columns included
+    print("\nDataFrame Preview:")
+    print("\nShape:", df.shape)
+    print("\nColumns:", list(df.columns))
+    print("\nFirst few rows:")
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.width', None)
+    print(df[['Project Code', 'Project Name', 'Start Date', 'End Date', 
+              'Actual Generation (kWh)', 'Expected Generation (kWh)', 
+              'Forecast Generation (kWh)', 'Variance with Expected Generation (%)']])
+    
+    return df
 
 # Execute and return DataFrame for Power BI
 df = main()
