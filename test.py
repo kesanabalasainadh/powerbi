@@ -8,7 +8,7 @@ import calendar
 PROJECT_CODES = ['0193', '0191']
 START_DATE = '2025-05-01'
 END_DATE = '2025-05-16'
-TOKEN = "eyJraWQiOiJRYjZZNEVhSVNseXJoTzdFaVFPeFJjbE0xaTdDTWZuRXQ2VXBaUGhUa21JPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiQmtGT0NvU3IzWXQtZ2V5RE1TTlBOQSIsInN1YiI6IjAyNWExYWQ2LWE4NDQtNGQ2MC1hMzRlLThhODMzYmQ5MDY5MSIsImN1c3RvbTpyZXN0cmljdFByb2plY3RzIjoibm8iLCJjdXN0b206dGltZXpvbmUiOiJBbWVyaWNhXC9OZXdfWW9yayIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjdXN0b206bGFzdE5hbWUiOiJBZG1pbiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xXzdCQkJoR2YxcCIsImN1c3RvbTpwcmV2ZW50RG93bmxvYWQiOiJubyIsImNvZ25pdG86dXNlcm5hbWUiOiIwMjVhMWFkNi1hODQ0LTRkNjAtYTM0ZS04YTgzM2JkOTA2OTEiLCJjdXN0b206c3RhcnREYXRlIjoiMjAyNC0xMi0xNiIsImN1c3RvbTpvcmdhbml6YXRpb25JZCI6Im9yZ2FuaXphdGlvbi04MDJlNjZlOS03YWU3LTQwYTktOTg4MC0xMjU3ZTUwZTNiZTIiLCJjdXN0b206dXNlclR5cGUiOiJ1c2VyLXR5cGUtZWY2NTMwMGQtNDQ5ZC00YmFiLTgzZDEtYmRiOWM0OTA4M2IwIiwiYXVkIjoiMW11bHNkZzZkMWlxY2djZGFkdm1iODVpMDgiLCJldmVudF9pZCI6Ijk5NDFlNzAxLTUxMzUtNDMwYy05NmQyLTdiYzcxYzFmODJmNCIsImN1c3RvbTpmaXJzdE5hbWUiOiJCYWxhLlNreXZpZXciLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc0NjMxMDUxNiwiZXhwIjoxNzQ5MTAzMDk2LCJpYXQiOjE3NDkwOTk0OTYsImVtYWlsIjoiYmFsYStza3l2aWV3X2FkbWluQGVjb3N1aXRlLmlvIn0.nfDHrPFXc71hVJuwxl1GogXT6HCJt-XSt68TAcU9hs2s4aeeUMYfHZhil0STlfBjqCFj96QO8hfKeOCi5TtOVAo2usr-Nq--eIMU993i5vo_SkdFjoOWeaOrxa1Gg1oe4ByYIlzbOc08FtUIzefxOTROEeKZG_DU2XduhMVTadh-VZxKjag7S_zpLiWwDsa-kUn-ql_9nDmbnoNQQL-rlcb4TxB91pfmVhS0S3prE-0qkZ63GVXX2nPG1c-kVGwf8WmwsVWM3MnUwlSdarAI0WJOYqzxieh-Dgt-j8u1cDh3ajQjkShEAWy8GfgR0CP1vc2z8BMdmPXOQNRYLpoPLw"
+TOKEN = "eyJraWQiOiJRYjZZNEVhSVNseXJoTzdFaVFPeFJjbE0xaTdDTWZuRXQ2VXBaUGhUa21JPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoic0ladE9yMTB2ZWVHYzVCWWtyal91USIsInN1YiI6IjAyNWExYWQ2LWE4NDQtNGQ2MC1hMzRlLThhODMzYmQ5MDY5MSIsImN1c3RvbTpyZXN0cmljdFByb2plY3RzIjoibm8iLCJjdXN0b206dGltZXpvbmUiOiJBbWVyaWNhXC9OZXdfWW9yayIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjdXN0b206bGFzdE5hbWUiOiJBZG1pbiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xXzdCQkJoR2YxcCIsImN1c3RvbTpwcmV2ZW50RG93bmxvYWQiOiJubyIsImNvZ25pdG86dXNlcm5hbWUiOiIwMjVhMWFkNi1hODQ0LTRkNjAtYTM0ZS04YTgzM2JkOTA2OTEiLCJjdXN0b206c3RhcnREYXRlIjoiMjAyNC0xMi0xNiIsImN1c3RvbTpvcmdhbml6YXRpb25JZCI6Im9yZ2FuaXphdGlvbi04MDJlNjZlOS03YWU3LTQwYTktOTg4MC0xMjU3ZTUwZTNiZTIiLCJjdXN0b206dXNlclR5cGUiOiJ1c2VyLXR5cGUtZWY2NTMwMGQtNDQ5ZC00YmFiLTgzZDEtYmRiOWM0OTA4M2IwIiwiYXVkIjoiMW11bHNkZzZkMWlxY2djZGFkdm1iODVpMDgiLCJldmVudF9pZCI6Ijk5NDFlNzAxLTUxMzUtNDMwYy05NmQyLTdiYzcxYzFmODJmNCIsImN1c3RvbTpmaXJzdE5hbWUiOiJCYWxhLlNreXZpZXciLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc0NjMxMDUxNiwiZXhwIjoxNzQ5MTA0MjQxLCJpYXQiOjE3NDkxMDA2NDEsImVtYWlsIjoiYmFsYStza3l2aWV3X2FkbWluQGVjb3N1aXRlLmlvIn0.cXYl0s8l1WBGCJWK3lvaN_rEBDaFr0g4ou152ZQvtFBPgKKRVJ0kAtkrxudoK4mXtBK7UILzxGvaefvLz2-LaQLtMnU2RR3hmXgKu7uIeesmdTD_l0Ak5vkcjA0D_dl7DwGXFtu3HRgfU2zzQFs3DSUJXqH0NZ5bfXqRUl4lHAp7Zv6AY5gturPU9L6ctd0kgIZLoyDUV5tgKottYLDliVvDqX-b5_Z0YnwyahU8oNe2-lPgOYqfdmzZlSSkDu7uqyHzjjbDAHbF3j6QJiDN1uU1mwMC1QhGKrKHDJ2bt_yj28wOvU65Vo83pvSZ6XyyWJji-rqGI4gcBnEttboj_g"
 
 def adjust_end_date(end_date: str) -> str:
     """Adjust end date by adding one day to include the specified end date in results"""
@@ -96,30 +96,35 @@ def process_project_data(project_id: str, start_date: str, end_date: str, token:
                project_details.get('project', {}).get('productionStartDate', '')
     system_size = project_details.get('project', {}).get('dcSize', 0)
 
-    # Calculate actual generation
+    # Calculate actual generation - updated to match main.py logic
     actual_gen = 0
     try:
         sites = energy_data.get('project', {}).get('sites', {})
-        for site_data in sites.values():
+        for site_id, site_data in sites.items():
             systems = site_data.get('systems', {})
-            for system_data in systems.values():
+            for system_id, system_data in systems.items():
                 aggregated_totals = system_data.get('aggregatedTotals', {})
-                for values in aggregated_totals.values():
-                    actual_gen += values.get('generation', 0) / 1000  # Convert to kWh
+                for timestamp, values in aggregated_totals.items():
+                    generation = values.get('generation', 0)
+                    actual_gen += generation / 1000  # Convert Wh to kWh
+        print(f"✅ Total actual generation: {actual_gen:,.2f} kWh")
     except Exception as e:
-        print(f"Error calculating actual generation: {e}")
+        print(f"❌ Error calculating actual generation: {str(e)}")
 
-    # Calculate expected generation
+    # Calculate expected generation - update to exactly match main.py logic
     expected_gen = 0
     try:
-        project_data = expected_gen_data.get('projects', {}).get(project_id, {})
-        if 'expectedGeneration' in project_data:
-            expected_gen = project_data['expectedGeneration'] / 1000
-        else:
-            for data in project_data.get('aggregatedTotals', {}).values():
-                expected_gen += data.get('expectedGeneration', 0) / 1000
+        if 'projects' in expected_gen_data and project_id in expected_gen_data['projects']:
+            project_data = expected_gen_data['projects'][project_id]
+            if 'expectedGeneration' in project_data:
+                expected_gen = project_data['expectedGeneration'] / 1000
+            else:
+                for date_key, data in project_data.get('aggregatedTotals', {}).items():
+                    if date_key.startswith(start_date[:7]):  # Match month/year
+                        expected_gen += data.get('expectedGeneration', 0) / 1000
+        print(f"✅ Total expected generation: {expected_gen:,.2f} kWh")
     except Exception as e:
-        print(f"Error calculating expected generation: {e}")
+        print(f"❌ Error calculating expected generation: {str(e)}")
 
     # Calculate forecast generation
     forecast_gen = 0
@@ -207,6 +212,8 @@ def process_project_data(project_id: str, start_date: str, end_date: str, token:
         'Project Name': project_name,
         'State': project_state,
         'COD': cod_date,
+        'Start Date': start_date,  # Added start date
+        'End Date': end_date,      # Added end date
         'Size (kW)': system_size,
         'Actual Generation (kWh)': actual_gen,
         'Expected Generation (kWh)': expected_gen,
@@ -244,8 +251,9 @@ def main() -> pd.DataFrame:
             project_data = process_project_data(project_id, START_DATE, END_DATE, TOKEN)
             all_data.append(project_data)
             
-            # Add print statements to show generation values
+            # Add print statements to show generation values with dates
             print(f"\nProject {project_id} Generation Summary:")
+            print(f"Period: {project_data['Start Date']} to {project_data['End Date']}")
             print(f"Actual Generation: {project_data['Actual Generation (kWh)']:,.2f} kWh")
             print(f"Expected Generation: {project_data['Expected Generation (kWh)']:,.2f} kWh")
             print(f"Forecast Generation: {project_data['Forecast Generation (kWh)']:,.2f} kWh")
@@ -257,16 +265,16 @@ def main() -> pd.DataFrame:
     
     df = pd.DataFrame(all_data)
     
-    # Print DataFrame preview
+    # Print DataFrame preview with date columns included
     print("\nDataFrame Preview:")
     print("\nShape:", df.shape)
     print("\nColumns:", list(df.columns))
     print("\nFirst few rows:")
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', None)
-    print(df[['Project Code', 'Project Name', 'Actual Generation (kWh)', 
-              'Expected Generation (kWh)', 'Forecast Generation (kWh)', 
-              'Variance with Expected Generation (%)']])
+    print(df[['Project Code', 'Project Name', 'Start Date', 'End Date', 
+              'Actual Generation (kWh)', 'Expected Generation (kWh)', 
+              'Forecast Generation (kWh)', 'Variance with Expected Generation (%)']])
     
     return df
 
