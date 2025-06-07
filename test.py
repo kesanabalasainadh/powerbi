@@ -9,10 +9,11 @@ import calendar
 #     '0193','0194'
 # ]
 
-TOKEN = r#"Token"
-START_DATE = r#"StartDate"
-END_DATE = r#"EndDate"
-PROJECT_CODES = r#"ProjectCodes".split(',')
+# Power BI passes parameter table as 'dataset'
+TOKEN = dataset['Token'][0]
+START_DATE = dataset['StartDate'][0]
+END_DATE = dataset['EndDate'][0]
+PROJECT_CODES = dataset['ProjectCodes'][0]  # already a list
 
 
 # START_DATE = '2025-05-01'
