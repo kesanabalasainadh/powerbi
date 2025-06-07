@@ -10,10 +10,10 @@ import calendar
 # ]
 
 # Power BI passes parameter table as 'dataset'
-TOKEN = dataset['Token'][0]
-START_DATE = dataset['StartDate'][0]
-END_DATE = dataset['EndDate'][0]
-PROJECT_CODES = dataset['ProjectCodes'][0]  # already a list
+token = dataset.loc[dataset['Name'] == 'Token', 'Value'].values[0]
+start_date = dataset.loc[dataset['Name'] == 'StartDate', 'Value'].values[0]
+end_date = dataset.loc[dataset['Name'] == 'EndDate', 'Value'].values[0]
+project_codes = dataset.loc[dataset['Name'] == 'ProjectCodes', 'Value'].values[0]
 
 
 # START_DATE = '2025-05-01'
