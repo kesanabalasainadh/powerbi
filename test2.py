@@ -5,10 +5,12 @@ import pandas as pd
 import calendar
 
 # Hardcoded inputs
-PROJECT_CODES = ['0193', '0191','0164']
+PROJECT_CODES = [
+'0193','0190','0164']
+
 START_DATE = '2025-05-01'
 END_DATE = '2025-05-31'
-TOKEN = "eyJraWQiOiJRYjZZNEVhSVNseXJoTzdFaVFPeFJjbE0xaTdDTWZuRXQ2VXBaUGhUa21JPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiQmtGT0NvU3IzWXQtZ2V5RE1TTlBOQSIsInN1YiI6IjAyNWExYWQ2LWE4NDQtNGQ2MC1hMzRlLThhODMzYmQ5MDY5MSIsImN1c3RvbTpyZXN0cmljdFByb2plY3RzIjoibm8iLCJjdXN0b206dGltZXpvbmUiOiJBbWVyaWNhXC9OZXdfWW9yayIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjdXN0b206bGFzdE5hbWUiOiJBZG1pbiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xXzdCQkJoR2YxcCIsImN1c3RvbTpwcmV2ZW50RG93bmxvYWQiOiJubyIsImNvZ25pdG86dXNlcm5hbWUiOiIwMjVhMWFkNi1hODQ0LTRkNjAtYTM0ZS04YTgzM2JkOTA2OTEiLCJjdXN0b206c3RhcnREYXRlIjoiMjAyNC0xMi0xNiIsImN1c3RvbTpvcmdhbml6YXRpb25JZCI6Im9yZ2FuaXphdGlvbi04MDJlNjZlOS03YWU3LTQwYTktOTg4MC0xMjU3ZTUwZTNiZTIiLCJjdXN0b206dXNlclR5cGUiOiJ1c2VyLXR5cGUtZWY2NTMwMGQtNDQ5ZC00YmFiLTgzZDEtYmRiOWM0OTA4M2IwIiwiYXVkIjoiMW11bHNkZzZkMWlxY2djZGFkdm1iODVpMDgiLCJldmVudF9pZCI6Ijk5NDFlNzAxLTUxMzUtNDMwYy05NmQyLTdiYzcxYzFmODJmNCIsImN1c3RvbTpmaXJzdE5hbWUiOiJCYWxhLlNreXZpZXciLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc0NjMxMDUxNiwiZXhwIjoxNzQ5MTAzMDk2LCJpYXQiOjE3NDkwOTk0OTYsImVtYWlsIjoiYmFsYStza3l2aWV3X2FkbWluQGVjb3N1aXRlLmlvIn0.nfDHrPFXc71hVJuwxl1GogXT6HCJt-XSt68TAcU9hs2s4aeeUMYfHZhil0STlfBjqCFj96QO8hfKeOCi5TtOVAo2usr-Nq--eIMU993i5vo_SkdFjoOWeaOrxa1Gg1oe4ByYIlzbOc08FtUIzefxOTROEeKZG_DU2XduhMVTadh-VZxKjag7S_zpLiWwDsa-kUn-ql_9nDmbnoNQQL-rlcb4TxB91pfmVhS0S3prE-0qkZ63GVXX2nPG1c-kVGwf8WmwsVWM3MnUwlSdarAI0WJOYqzxieh-Dgt-j8u1cDh3ajQjkShEAWy8GfgR0CP1vc2z8BMdmPXOQNRYLpoPLw"
+TOKEN = "eyJraWQiOiJRYjZZNEVhSVNseXJoTzdFaVFPeFJjbE0xaTdDTWZuRXQ2VXBaUGhUa21JPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiV1ZxaUlhLU9KZW1wMDZOVWVsd1FGdyIsInN1YiI6IjAyNWExYWQ2LWE4NDQtNGQ2MC1hMzRlLThhODMzYmQ5MDY5MSIsImN1c3RvbTpyZXN0cmljdFByb2plY3RzIjoibm8iLCJjdXN0b206dGltZXpvbmUiOiJBbWVyaWNhXC9OZXdfWW9yayIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjdXN0b206bGFzdE5hbWUiOiJBZG1pbiIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xXzdCQkJoR2YxcCIsImN1c3RvbTpwcmV2ZW50RG93bmxvYWQiOiJubyIsImNvZ25pdG86dXNlcm5hbWUiOiIwMjVhMWFkNi1hODQ0LTRkNjAtYTM0ZS04YTgzM2JkOTA2OTEiLCJjdXN0b206c3RhcnREYXRlIjoiMjAyNC0xMi0xNiIsImN1c3RvbTpvcmdhbml6YXRpb25JZCI6Im9yZ2FuaXphdGlvbi04MDJlNjZlOS03YWU3LTQwYTktOTg4MC0xMjU3ZTUwZTNiZTIiLCJjdXN0b206dXNlclR5cGUiOiJ1c2VyLXR5cGUtZWY2NTMwMGQtNDQ5ZC00YmFiLTgzZDEtYmRiOWM0OTA4M2IwIiwiYXVkIjoiMW11bHNkZzZkMWlxY2djZGFkdm1iODVpMDgiLCJldmVudF9pZCI6Ijk5NDFlNzAxLTUxMzUtNDMwYy05NmQyLTdiYzcxYzFmODJmNCIsImN1c3RvbTpmaXJzdE5hbWUiOiJCYWxhLlNreXZpZXciLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc0NjMxMDUxNiwiZXhwIjoxNzQ5MjgzNzMwLCJpYXQiOjE3NDkyODAxMzAsImVtYWlsIjoiYmFsYStza3l2aWV3X2FkbWluQGVjb3N1aXRlLmlvIn0.PM3mCBeoueL_DIv7NTym27gX4b7m_R1nSln_89R5OqDkk41Vdh7iw8Hgi5jo2ofEpBtJ-USEqSyDV_MZ8Fp53ZhpXP1DAD3LPPXMUJBHvzW3LPuqtBkmDYCg0pweujj-TPZ1JBL2SnWVJHn8wtANKk7dm9LXXc-MZpDsQ1ix_NqSbz92nlLTLDVU4patNfEz2fWAoFiQYVslaj27ppdpdxvH48gYT14aR0Brwnt6UXQXUJmMpDzJVDiaWEmu_ZjFX5ABDdrJgmqTW_cd4BzN9djeWsedYdwZGBN2x4gA2NRvEwfF05jlSDwOi8C8IUGcgKK547CNkC5VvS6L_10yTQ"
 
 def adjust_end_date(end_date: str) -> str:
     """Adjust end date by adding one day to include the specified end date in results"""
@@ -48,18 +50,33 @@ def fetch_ecosuite_energy_datums(project_id: str, start_date: str, end_date: str
     return response.json() if response.status_code == 200 else None
 
 def fetch_expected_generation(project_id: str, start_date: str, end_date: str, token: str) -> Optional[Dict]:
-    """Fetch expected generation from Ecosuite API"""
-    endpoint = "https://api.ecosuite.io/energy/datums/generation/expected"
-    headers = {"Authorization": f"Bearer {token}"}
+    """Fetch expected generation data from the Ecosuite API"""
+    base_url = "https://api.ecosuite.io/energy/datums/generation/expected"
+    
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Adjust end date to include the specified end date in results
+    adjusted_end_date = adjust_end_date(end_date)
     
     params = {
         "start": start_date,
-        "end": end_date,
+        "end": adjusted_end_date,
         "projectIds": project_id
     }
     
-    response = requests.get(endpoint, headers=headers, params=params)
-    return response.json() if response.status_code == 200 else None
+    try:
+        response = requests.get(base_url, headers=headers, params=params)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Error fetching expected generation: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"Exception in fetch_expected_generation: {str(e)}")
+        return None
 
 def fetch_forecast_generation(project_id: str, start_date: str, end_date: str, token: str) -> Optional[Dict]:
     """Fetch forecast generation from Ecosuite API"""
@@ -111,18 +128,17 @@ def process_project_data(project_id: str, start_date: str, end_date: str, token:
     except Exception as e:
         print(f"❌ Error calculating actual generation: {str(e)}")
 
-    # Calculate expected generation - updated to match main.py logic
+    # Calculate expected generation - fixed to match main.py logic exactly
     expected_gen = 0
     try:
-        project_data = expected_gen_data.get('projects', {}).get(project_id, {})
-        if 'expectedGeneration' in project_data:
-            expected_gen = project_data['expectedGeneration'] / 1000
-        else:
-            for date_key, data in project_data.get('aggregatedTotals', {}).items():
-                if date_key.startswith(start_date[:7]):  # Match month/year
-                    expected_gen += data.get('expectedGeneration', 0) / 1000
+        for date_key, data in expected_gen_data.get('projects', {}).get(project_id, {}).get('aggregatedTotals', {}).items():
+            expected_gen += data.get('expectedGeneration', 0)
+        
+        # Convert from Wh to kWh
+        expected_gen /= 1000
+        print(f"✅ Total expected generation: {expected_gen:,.2f} kWh")
     except Exception as e:
-        print(f"Error calculating expected generation: {e}")
+        print(f"❌ Error calculating expected generation: {str(e)}")
 
     # Calculate forecast generation
     forecast_gen = 0
