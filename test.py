@@ -4,16 +4,21 @@ from typing import List, Dict, Optional
 import pandas as pd
 import calendar
 
-# # Hardcoded inputs
-# PROJECT_CODES = [
-#     '0193','0194'
-# ]
-
-# Power BI passes parameter table as 'dataset'
+# === Extract parameters from Power BI 'dataset' ===
 token = dataset.loc[dataset['Name'] == 'Token', 'Value'].values[0]
 start_date = dataset.loc[dataset['Name'] == 'StartDate', 'Value'].values[0]
 end_date = dataset.loc[dataset['Name'] == 'EndDate', 'Value'].values[0]
 project_codes = dataset.loc[dataset['Name'] == 'ProjectCodes', 'Value'].values[0]
+
+if isinstance(project_codes, str):
+    project_codes = [code.strip() for code in project_codes.split(',')]
+
+# === Assign to uppercase vars for backward compatibility ===
+TOKEN = token
+START_DATE = start_date
+END_DATE = end_date
+PROJECT_CODES = project_codes
+
 
 
 # START_DATE = '2025-05-01'
@@ -287,19 +292,23 @@ def main() -> pd.DataFrame:
     
     df = pd.DataFrame(all_data)
     
-    # Print DataFrame preview with date columns included
-    print("\nDataFrame Preview:")
-    print("\nShape:", df.shape)
-    print("\nColumns:", list(df.columns))
-    print("\nFirst few rows:")
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.width', None)
-    print(df[['Project Code', 'Project Name', 'Start Date', 'End Date', 
-              'Actual Generation (kWh)', 'Expected Generation (kWh)', 
-              'Forecast Generation (kWh)', 'Variance with Expected Generation (%)']])
+    if df.empty:
+        print("⚠️ No data returned from main() — check token, project codes, or date range.")
+    else:
+        print("\n✅ DataFrame Preview:")
+        print("Shape:", df.shape)
+        print("Columns:", list(df.columns))
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.width', None)
+        # Only try to print specific columns if they exist
+        expected_cols = ['Project Code', 'Project Name', 'Start Date', 'End Date', 
+                         'Actual Generation (kWh)', 'Expected Generation (kWh)', 
+                         'Forecast Generation (kWh)', 'Variance with Expected Generation (%)']
+        available_cols = [col for col in expected_cols if col in df.columns]
+        print(df[available_cols].head())
     
     return df
 
+
 # Execute and return DataFrame for Power BI
-df = main()
-df  # Return DataFrame
+dataset = main()
